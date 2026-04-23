@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='homeStyle.css') }}" />
+    <title>Hotel Booking System</title>
+  </head>
+  <body>
+    <header>
+      <div class="logo">Hotel Booking System</div>
+      <div class="nav-buttons">
+        <a href="{{ url_for('signup') }}" class="btn-nav">Sign Up</a>
+        <a href="{{ url_for('login') }}" class="btn-nav">Login</a>
+      </div>
+    </header>
+
+    <main>
+      <h1>Find your next stay</h1>
+      <p>Search deals on hotels, homes, and much more...</p>
+
+      <div class="search-container">
+        <input type="text" placeholder="Where are you going?" />
+        <input type="date" />
+        <input type="text" placeholder="2 adults · 0 children · 1 room" />
+        <button>Search</button>
+      </div>
+
+      <div class="features">
+        <div class="feature-item">✓ FREE cancellation on most rooms</div>
+        <div class="feature-item">✓ 300M+ reviews from fellow travelers</div>
+        <div class="feature-item">✓ 2+ million properties worldwide</div>
+        <div class="feature-item">✓ 24/7 customer service</div>
+      </div>
+    </main>
+  </body>
+</html>
