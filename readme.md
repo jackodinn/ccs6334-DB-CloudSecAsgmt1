@@ -20,6 +20,15 @@ If you are unsure which version of odbc driver you're running try this.
 3. On ODBC Data sources window, click drivers, and now you will see your ODBC driver version.
 
 If your ODBC driver is 18, change app.py line 23 that writes f"DRIVER={{ODBC Driver XX for SQL Server}};", and test_conn.py line 9 that contains driver = "{ODBC Driver XX for SQL Server}".
+___
+### MKCERT INSTALL TUTORIAL.
+1. Launch Powershell as Admin. 
+2. Type "choco install mkcert". If finished, type "mkcert -install". (You can uninstall it by typing "mkcert -uninstall" on terminal).
+3. Close powershell, go to the terminal where your run the python app.py
+4. Type "mkcert localhost 127.0.0.1", to generate 2 certificate files.
+5. Rename them into "localhost.pem", and "localhost-key.pem".
+6. Try running the program, if you cant load into the webpage please wait for a little while. 
+___
 
 ## Updates
 
@@ -27,4 +36,6 @@ If your ODBC driver is 18, change app.py line 23 that writes f"DRIVER={{ODBC Dri
 
 8/5/2026 - Added Authentication & Authorization functions with hashed password, performed gray box testing on these modules.
 
-14/5/2026 - Added admin page, and better authentication module. **Contributed by ZBao10**
+14/5/2026 - Added admin page, and better authentication module. **_Contributed by ZBao10_**
+
+14/5/2026 - Added HTTPS using mkcert, for security feature.
