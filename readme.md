@@ -19,3 +19,5 @@ ___
 23/4/2026 - Created the repository, Initialized database, and slightly finished home.html, homestyle.css and home()
 
 8/5/2026 - Added Authentication & Authorization functions with hashed password, performed gray box testing on these modules.
+
+14/5/2026 - Added admin page, and better authentication module. **Contributed by ZBao10**
