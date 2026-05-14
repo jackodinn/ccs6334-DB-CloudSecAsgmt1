@@ -13,6 +13,13 @@
 10. On your local machine, open Command Prompt and redirect the directory into whatever this directory is located, do "pip install -r requirements.txt".
 11. Once installed, you can test your connection by running "test_conn.py". If it works, you may launch the python app.
 ___
+### NOTE OF RUNNING ODBC DRIVERS
+If you are unsure which version of odbc driver you're running try this.
+1. Search ODBC on Windows Search Bar.
+2. Click ODBC data sources.
+3. On ODBC Data sources window, click drivers, and now you will see your ODBC driver version.
+
+If your ODBC driver is 18, change app.py line 23 that writes f"DRIVER={{ODBC Driver XX for SQL Server}};", and test_conn.py line 9 that contains driver = "{ODBC Driver XX for SQL Server}".
 
 ## Updates
 
