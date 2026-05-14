@@ -33,6 +33,11 @@ connection_params = urllib.parse.quote_plus(
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mssql+pyodbc:///?odbc_connect={connection_params}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'a-strong-default-key')
+app.config.update(
+    SESSION_COOKIE_SECURE=True,    # Only send cookies over HTTPS
+    SESSION_COOKIE_HTTPONLY=True,  # Prevent JavaScript from accessing cookies
+    SESSION_COOKIE_SAMESITE='Lax', # Protect against CSRF
+)
 
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -249,4 +254,4 @@ if __name__ == '__main__':
     # Create tables if they don't exist (for first run)
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(debug=True, ssl_context=('localhost.pem', 'localhost-key.pem'))  # Use SSL for secure cookies in development
