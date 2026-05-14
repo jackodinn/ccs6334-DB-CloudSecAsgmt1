@@ -1,37 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='homeStyle.css') }}">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='homeStyle.css') }}" />
     <title>Hotel Booking System</title>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <div class="logo">Hotel Booking System</div>
-        <div class="nav-buttons">
-            <a href="{{ url_for('signup') }}" class="btn-nav">Sign Up</a>
-            <a href="{{ url_for('login') }}" class="btn-nav">Login</a>
-        </div>
+      <div class="logo">Hotel Booking System</div>
+      <div class="nav-buttons">
+        {% if current_user.is_authenticated %}
+          <span class="welcome-text">Welcome, **{{ current_user.username }}**</span>
+
+          {% if current_user.is_admin %}
+            <a href="{{ url_for('admin_dashboard') }}" class="btn-nav btn-admin">Dashboard</a>
+          {% endif %}
+
+          <a href="{{ url_for('logout') }}" class="btn-nav">Logout</a>
+        {% else %}
+          <a href="{{ url_for('signup') }}" class="btn-nav">Sign Up</a>
+          <a href="{{ url_for('login') }}" class="btn-nav">Login</a>
+        {% endif %}
+      </div>
     </header>
 
     <main>
-        <h1>Find your next stay</h1>
-        <p>Search deals on hotels, homes, and much more...</p>
+      <h1>Find your next stay</h1>
+      <p>Search deals on hotels, homes, and much more...</p>
 
-        <!-- Search form -->
-        <form method="GET" action="{{ url_for('search') }}" class="search-container">
-            <input type="text" name="destination" placeholder="Where are you going?" required>
-            <input type="date" name="check_in" required>
-            <input type="text" name="guests" placeholder="2 adults · 0 children · 1 room">
-            <button type="submit">Search</button>
-        </form>
+      <!-- Search form -->
+      <form method="GET" action="{{ url_for('search') }}" class="search-container">
+        <input type="text" name="destination" placeholder="Where are you going?" required />
+        <input type="date" name="check_in" required />
+        <input type="text" name="guests" placeholder="2 adults · 0 children · 1 room" />
+        <button type="submit">Search</button>
+      </form>
 
-        <div class="features">
-            <div class="feature-item">✓ FREE cancellation on most rooms</div>
-            <div class="feature-item">✓ 300M+ reviews from fellow travelers</div>
-            <div class="feature-item">✓ 2+ million properties worldwide</div>
-            <div class="feature-item">✓ 24/7 customer service</div>
-        </div>
+      <div class="features">
+        <div class="feature-item">✓ FREE cancellation on most rooms</div>
+        <div class="feature-item">✓ 300M+ reviews from fellow travelers</div>
+        <div class="feature-item">✓ 2+ million properties worldwide</div>
+        <div class="feature-item">✓ 24/7 customer service</div>
+      </div>
     </main>
-</body>
+  </body>
 </html>

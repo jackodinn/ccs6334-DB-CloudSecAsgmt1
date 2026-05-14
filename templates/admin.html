@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard – Hotel Booking System</title>
+  <style>
+    :root {
+      --bg-color: #eef1fa;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --success: #16a34a;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+    body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; }
+
+    /* ── Header ── */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo { font-size: 18px; font-weight: 700; color: var(--primary); }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .header-right span { font-size: 14px; color: var(--text-muted); }
+    .btn-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+      text-decoration: none;
+      padding: 6px 14px;
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      transition: background .15s;
+    }
+    .btn-link:hover { background: var(--primary); color: #fff; }
+
+    /* ── Main layout ── */
+    main { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+    h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; }
+
+    /* ── Flash messages ── */
+    .flash-list { list-style: none; margin-bottom: 20px; }
+    .flash { padding: 12px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 8px; }
+    .flash.success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .flash.danger  { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .flash.info    { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
+    .flash.warning { background: #fef9c3; color: #854d0e; border: 1px solid #fde68a; }
+
+    /* ── Stats cards ── */
+    .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+    .stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+    .stat-value { font-size: 32px; font-weight: 700; margin-top: 6px; }
+    .stat-value.blue   { color: var(--primary); }
+    .stat-value.green  { color: var(--success); }
+    .stat-value.orange { color: #ea580c; }
+
+    /* ── Table card ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-header h2 { font-size: 16px; font-weight: 600; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text-muted);
+      background: #f9fafb;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f9fafb; }
+    td { padding: 14px 16px; font-size: 14px; vertical-align: middle; }
+
+    /* badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-admin   { background: #ede9fe; color: #5b21b6; }
+    .badge-user    { background: #f3f4f6; color: #4b5563; }
+
+    /* action buttons */
+    .btn-sm {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: opacity .15s;
+    }
+    .btn-sm:hover { opacity: .85; }
+    .btn-promote  { background: #ede9fe; color: #5b21b6; }
+    .btn-demote   { background: #fef3c7; color: #92400e; }
+    .btn-delete   { background: #fee2e2; color: var(--danger); }
+
+    /* empty state */
+    .empty { text-align: center; padding: 48px; color: var(--text-muted); font-size: 15px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <span class="logo">🏨 Hotel Booking System</span>
+  <div class="header-right">
+    <span>Logged in as <strong>{{ current_user.username }}</strong></span>
+    <a href="{{ url_for('home') }}" class="btn-link">← Home</a>
+    <a href="{{ url_for('logout') }}" class="btn-link">Logout</a>
+  </div>
+</header>
+
+<!-- ── Main ── -->
+<main>
+  <h1>Admin Dashboard</h1>
+  <p class="subtitle">Manage all registered users and their roles.</p>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flash-list">
+        {% for category, message in messages %}
+          <li class="flash {{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Total Users</div>
+      <div class="stat-value blue">{{ users | length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Admins</div>
+      <div class="stat-value green">{{ users | selectattr('is_admin') | list | length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Regular Users</div>
+      <div class="stat-value orange">{{ users | rejectattr('is_admin') | list | length }}</div>
+    </div>
+  </div>
+
+  <!-- Users table -->
+  <div class="card">
+    <div class="card-header">
+      <h2>All Users</h2>
+    </div>
+
+    {% if users %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Display Name</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td style="color:var(--text-muted)">{{ user.user_id }}</td>
+          <td><strong>{{ user.username }}</strong></td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.profile.display_name if user.profile and user.profile.display_name else '—' }}</td>
+          <td>
+            {% if user.is_admin %}
+              <span class="badge badge-admin">⭐ Admin</span>
+            {% else %}
+              <span class="badge badge-user">User</span>
+            {% endif %}
+          </td>
+          <td style="display:flex; gap:8px; flex-wrap:wrap;">
+            {% if user.user_id != current_user.user_id %}
+              {% if user.is_admin %}
+                <!-- Demote to regular user -->
+                <form method="POST" action="{{ url_for('admin_toggle_role', user_id=user.user_id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-sm btn-demote">Demote</button>
+                </form>
+              {% else %}
+                <!-- Promote to admin -->
+                <form method="POST" action="{{ url_for('admin_toggle_role', user_id=user.user_id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-sm btn-promote">Make Admin</button>
+                </form>
+              {% endif %}
+              <!-- Delete user -->
+              <form method="POST" action="{{ url_for('admin_delete_user', user_id=user.user_id) }}"
+                    onsubmit="return confirm('Delete {{ user.username }}? This cannot be undone.')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-sm btn-delete">Delete</button>
+              </form>
+            {% else %}
+              <span style="font-size:12px;color:var(--text-muted)">You</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="empty">No users found in the database.</div>
+    {% endif %}
+  </div>
+</main>
+
+</body>
+</html>

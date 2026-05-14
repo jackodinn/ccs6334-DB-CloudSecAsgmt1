@@ -2,7 +2,7 @@ import os
 import pyodbc  # type: ignore
 import urllib
 import uuid
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,6 +12,8 @@ from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer
 from forms import RegistrationForm, LoginForm, ForgotPasswordForm, ResetPasswordForm
 from models import User, Profile  # You already have this
 from extension import db   # Assuming extension.py initializes db
+from functools import wraps
+from flask_wtf import CSRFProtect
 
 load_dotenv()
 
@@ -34,6 +36,7 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'a-strong-default-key')
 
 db.init_app(app)
 migrate = Migrate(app, db)
+csrf = CSRFProtect(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -48,6 +51,15 @@ def load_user(user_id):
 def get_reset_token(expires_sec=1800):
     s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
     return s
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            # Return a 403 Forbidden error if not an admin
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
 
 # --- Routes ---
 @app.route('/')
@@ -188,6 +200,50 @@ def home_search(token):
     # Here you would normally query your database with these parameters
     # For now, we'll just pass the data to the template to display
     return render_template('search_results.html', search=search_data)
+
+@app.route('/admin')
+@login_required
+@admin_required
+def admin_dashboard():
+    # Fetch all users to display in the table
+    users = User.query.all()
+    return render_template('admin.html', users=users)
+
+@app.route('/admin/toggle-role/<int:user_id>', methods=['POST'])
+@login_required
+@admin_required
+def admin_toggle_role(user_id):
+    user = User.query.get_or_404(user_id)
+    
+    # Prevent an admin from demoting themselves (safety check)
+    if user.user_id == current_user.user_id:
+        flash("You cannot change your own admin status.", "warning")
+        return redirect(url_for('admin_dashboard'))
+
+    # Toggle the boolean
+    user.is_admin = not user.is_admin
+    db.session.commit()
+    
+    role = "Admin" if user.is_admin else "Regular User"
+    flash(f"User {user.username} has been updated to {role}.", "success")
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/delete-user/<int:user_id>', methods=['POST'])
+@login_required
+@admin_required
+def admin_delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+
+    # Prevent self-deletion
+    if user.user_id == current_user.user_id:
+        flash("You cannot delete your own admin account.", "danger")
+        return redirect(url_for('admin_dashboard'))
+
+    db.session.delete(user)
+    db.session.commit()
+    
+    flash(f"User {user.username} has been deleted.", "info")
+    return redirect(url_for('admin_dashboard'))
 
 if __name__ == '__main__':
     # Create tables if they don't exist (for first run)
