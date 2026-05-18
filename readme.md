@@ -39,3 +39,7 @@ ___
 14/5/2026 - Added admin page, and better authentication module. **_Contributed by ZBao10_**
 
 14/5/2026 - Added HTTPS using mkcert, for security feature.
+
+19/5/2026 - Added audit logs in admin page. Added second admin confirmation for deleting and promoting a user.
+
+
