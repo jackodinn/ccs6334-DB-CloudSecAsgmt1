@@ -150,25 +150,74 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
 
-        if user and check_password_hash(user.password, form.password.data):
-            login_user(user)
+        # Username exists
+        if user:
+            # Account already frozen
+            if user.is_frozen:
+                save_audit_log(
+                    action="LOGIN_BLOCKED_FROZEN",
+                    details=f"Frozen account login attempt: {user.username}",
+                    user=user
+                )
 
+                flash("This account is frozen. Please contact an admin.", "danger")
+                return render_template('login.html', form=form)
+
+            # Correct password
+            if check_password_hash(user.password, form.password.data):
+                user.failed_login_attempts = 0
+                db.session.commit()
+
+                login_user(user)
+
+                save_audit_log(
+                    action="LOGIN_SUCCESS",
+                    details=f"User {user.username} logged in successfully.",
+                    user=user
+                )
+
+                flash('Logged in successfully.', 'success')
+
+                next_page = request.args.get('next')
+                return redirect(next_page) if next_page else redirect(url_for('home'))
+
+            # Wrong password
+            else:
+                user.failed_login_attempts += 1
+
+                if user.failed_login_attempts >= 5:
+                    user.is_frozen = True
+
+                    save_audit_log(
+                        action="ACCOUNT_FROZEN",
+                        details=f"Account {user.username} was frozen after 5 failed login attempts.",
+                        user=user
+                    )
+
+                    flash("Too many failed login attempts. This account has been frozen.", "danger")
+
+                else:
+                    remaining = 5 - user.failed_login_attempts
+
+                    save_audit_log(
+                        action="LOGIN_FAILED",
+                        details=f"Failed login for {user.username}. Attempts: {user.failed_login_attempts}/5.",
+                        user=user
+                    )
+
+                    flash(f"Invalid username or password. {remaining} attempt(s) remaining before freeze.", "danger")
+
+                db.session.commit()
+
+        # Username does not exist
+        else:
             save_audit_log(
-                action="LOGIN_SUCCESS",
-                details=f"User {user.username} logged in successfully.",
-                user=user
+                action="LOGIN_FAILED",
+                details=f"Failed login attempt for unknown username: {form.username.data}",
+                user=None
             )
 
-            flash('Logged in successfully.', 'success')
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('home'))
-
-        save_audit_log(
-            action="LOGIN_FAILED",
-            details=f"Failed login attempt for username: {form.username.data}",
-            username=form.username.data
-        )
-        flash('Invalid username or password.', 'danger')
+            flash('Invalid username or password.', 'danger')
 
     return render_template('login.html', form=form)
 
@@ -327,6 +376,24 @@ def admin_dashboard():
         pending_actions=pending_actions
     )
 
+@app.route('/admin/unfreeze-user/<int:user_id>', methods=['POST'])
+@login_required
+@admin_required
+def admin_unfreeze_user(user_id):
+    user = User.query.get_or_404(user_id)
+
+    user.is_frozen = False
+    user.failed_login_attempts = 0
+    db.session.commit()
+
+    save_audit_log(
+        action="ACCOUNT_UNFROZEN",
+        details=f"Admin {current_user.username} unfroze account {user.username}.",
+        user=current_user
+    )
+
+    flash(f"Account {user.username} has been unfrozen.", "success")
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/toggle-role/<int:user_id>', methods=['POST'])
 @login_required
