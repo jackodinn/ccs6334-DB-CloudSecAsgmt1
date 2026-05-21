@@ -42,7 +42,7 @@ ___
 
 19/5/2026 - Added audit logs in admin page. 
           - Added Admin Approvals Board for deleting and promoting a user. 
-          - Added Freeze account feature when login attempts are more than 5
+          - Added Freeze account feature when login attempts are more than 5 **_Contributed by ZBao10_**
 
 
 
