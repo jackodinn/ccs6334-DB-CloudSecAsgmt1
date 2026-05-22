@@ -12,6 +12,7 @@
 9. On your Virtualbox Manager, select your Win Server 2022 vm, go to settings, select network and check whichever has NAT attached. Once found, click Advanced, then Port Forwarding. Add a rule named "Flask", set TCP as protocol, put your ip as 127.0.0.1 and port as 1433 then click ok.
 10. On your local machine, open Command Prompt and redirect the directory into whatever this directory is located, do "pip install -r requirements.txt".
 11. Once installed, you can test your connection by running "test_conn.py". If it works, you may launch the python app.
+12. For adding DATABASE USER, open both SQLQuarry file and execute them. then restart SSMS. 
 ___
 ### NOTE OF RUNNING ODBC DRIVERS
 If you are unsure which version of odbc driver you're running try this.
@@ -43,6 +44,8 @@ ___
 19/5/2026 - Added audit logs in admin page. 
           - Added Admin Approvals Board for deleting and promoting a user. 
           - Added Freeze account feature when login attempts are more than 5 **_Contributed by ZBao10_**
+
+22/5/2026 - Added 2 SQLQuarry file for adding SQLDATABASE USER, (Admin and User) **_Contributed by ZBao10_**
 
 
 
