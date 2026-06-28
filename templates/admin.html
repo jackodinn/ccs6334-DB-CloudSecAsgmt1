@@ -458,35 +458,20 @@
             </td>
 
             <td style="display:flex; gap:8px; flex-wrap:wrap;">
-              {% if user.user_id != current_user.user_id %}
-
-                {% if user.is_frozen %}
-                  <form method="POST" action="{{ url_for('admin_unfreeze_user', user_id=user.user_id) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn-sm btn-unfreeze">Unfreeze</button>
-                  </form>
-                {% endif %}
-
-                {% if user.is_admin %}
-                  <form method="POST" action="{{ url_for('admin_toggle_role', user_id=user.user_id) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn-sm btn-demote">Request Demote</button>
-                  </form>
-                {% else %}
-                  <form method="POST" action="{{ url_for('admin_toggle_role', user_id=user.user_id) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn-sm btn-promote">Request Promote</button>
-                  </form>
-                {% endif %}
-
-                <form method="POST" action="{{ url_for('admin_delete_user', user_id=user.user_id) }}"
-                      onsubmit="return confirm('Request deletion for {{ user.username }}? Another admin must approve it.')">
+              {% if action.requested_by_id != current_user.user_id %}
+                <form method="POST" action="{{ url_for('approve_admin_action', request_id=action.request_id) }}">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="btn-sm btn-delete">Request Delete</button>
+                  <button type="submit" class="btn-sm btn-promote">Approve</button>
                 </form>
 
+                <form method="POST" action="{{ url_for('reject_admin_action', request_id=action.request_id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-sm btn-delete">Reject</button>
+                </form>
               {% else %}
-                <span style="font-size:12px;color:var(--text-muted)">You</span>
+                <span style="font-size:12px;color:var(--text-muted)">
+                  Waiting for another admin
+                </span>
               {% endif %}
             </td>
           </tr>

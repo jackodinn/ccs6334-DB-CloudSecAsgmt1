@@ -12,6 +12,9 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
 
+    failed_login_attempts = db.Column(db.Integer, default=0)
+    is_frozen = db.Column(db.Boolean, default=False)
+
     profile = db.relationship('Profile', backref='user', uselist=False)
 
     def get_id(self):
